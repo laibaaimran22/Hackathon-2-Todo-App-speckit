@@ -1,55 +1,48 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# Project Constitution: Phase I Todo In-Memory Python Console Application
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### In-Memory Data Constraint
+All task data must be stored in memory only using Python data structures (lists, dictionaries). No persistent storage mechanisms (files, databases, external storage) are permitted.
+<!-- Rule for architectural constraint -->
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### Specification-Driven Development
+All features must be traceable to a specification document. No implementation shall proceed without a clear, written specification that defines acceptance criteria.
+<!-- Rule for development methodology -->
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### Clean Code Architecture
+Code must follow clean code principles with clear separation of concerns. The application shall have a simple, maintainable structure with well-defined functions and classes.
+<!-- Rule for code quality -->
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### Console-First Interface
+The application must be console-based with clear, user-friendly text-based interaction. No GUI or web interface components are allowed in Phase I.
+<!-- Rule for user interface -->
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### Minimal Technology Stack
+Use only Python 3.13+ and UV for dependency management. No additional frameworks or libraries beyond what's necessary for core functionality.
+<!-- Rule for technology constraints -->
 
-### [PRINCIPLE_6_NAME]
+### Error Handling and Validation
+All functionality must include proper error handling and input validation. User inputs must be validated and clear error messages provided.
+<!-- Rule for quality assurance -->
 
+## Additional Constraints
+- Data is lost when the application terminates (in-memory only)
+- Task IDs must be auto-generated and consistent within a session
+- No external service dependencies
+- Console-based interaction model only
+<!-- Additional architectural boundaries -->
 
-[PRINCIPLE__DESCRIPTION]
-
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
-
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
-
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Development Workflow
+- Each feature must have a dedicated specification document in `/specs`
+- Specifications must include testable acceptance criteria
+- All specifications must be reviewed before implementation
+- Every implementation task must reference specific specification items
+- Follow PEP 8 style guide with type hints for all functions
+<!-- Development process requirements -->
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+This constitution establishes the foundational principles and governance framework for the Phase I Todo In-Memory Python Console Application. All development must comply with these principles. Constitutional amendments require explicit approval from project stakeholders and must be documented with clear rationale. Version number must be incremented according to semantic versioning rules. Regular compliance reviews ensure adherence to architectural boundaries.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
-
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2025-01-01 | **Last Amended**: 2025-01-01
+<!-- Constitution governance and versioning -->
