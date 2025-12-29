@@ -1,9 +1,10 @@
-# In-Memory Todo Console Application
+# Todo Application – Intermediate Level (Organization & Usability)
 
-A Phase I command-line todo application that stores tasks only in memory (no persistent storage). The application provides basic todo functionality including adding, viewing, updating, deleting, and marking tasks as complete/incomplete.
+This is a console-based todo application that provides enhanced organization and usability features including task priorities, tags, search, filter, and sort functionality while maintaining all Phase 1 basic functionality.
 
 ## Features
 
+### Phase 1 Features (Basic Functionality)
 - Add new tasks with title and description
 - View all tasks with clear status indicators
 - Update existing task details
@@ -11,6 +12,13 @@ A Phase I command-line todo application that stores tasks only in memory (no per
 - Mark tasks as complete or incomplete
 - Console-based user interface
 - In-memory storage (data lost on application exit)
+
+### Phase 2 Features (Organization & Usability)
+- **Task Priorities**: Assign priority levels (High, Medium, Low) to tasks
+- **Tags / Categories**: Assign one or more tags to tasks for categorization
+- **Search Tasks**: Search tasks by keyword in title or description
+- **Filter Tasks**: Filter by completion status, priority level, or tags
+- **Sort Tasks**: Sort by due date, priority, or alphabetically by title
 
 ## Requirements
 
@@ -32,53 +40,76 @@ A Phase I command-line todo application that stores tasks only in memory (no per
 To run the application:
 
 ```bash
-python src/main.py
+python -m src.cli.todo_cli add "Task Title" --description "Task Description" --priority High --tags tag1 tag2 --due-date 2023-12-31
 ```
 
-## Usage
+### List Tasks
+```bash
+python -m src.cli.todo_cli list
+```
 
-The application provides a menu-driven interface:
+With filtering:
+```bash
+python -m src.cli.todo_cli list --status completed --priority High --tag work
+```
 
-1. **Add a new task**: Enter a title (required) and description (optional)
-2. **View all tasks**: See all tasks with their IDs and completion status
-3. **Update an existing task**: Modify title or description by task ID
-4. **Delete a task**: Remove a task by its ID
-5. **Mark task as complete/incomplete**: Update the completion status of a task
-6. **Exit**: Quit the application
+With sorting:
+```bash
+python -m src.cli.todo_cli list --sort priority --reverse
+```
+
+### Search Tasks
+```bash
+python -m src.cli.todo_cli search "keyword"
+```
+
+### Mark Task as Complete
+```bash
+python -m src.cli.todo_cli complete 1
+```
+
+### Delete Task
+```bash
+python -m src.cli.todo_cli delete 1
+```
 
 ## Architecture
 
-The application follows a simple layered architecture:
-- `main.py`: Entry point and CLI interface
-- `task_manager.py`: Core task operations and business logic
-- `display.py`: Output formatting and display functions
-- `models.py`: Task data model definition
+The application follows a clean architecture with separation of concerns:
 
-## Project Structure
+- `src/models/task.py`: Task model with extended functionality
+- `src/services/task_service.py`: Business logic for task management
+- `src/services/validation.py`: Validation functions for all new features
+- `src/lib/utils.py`: Utility functions for sorting, filtering, and search
+- `src/cli/todo_cli.py`: Command-line interface
+- `tests/unit/`: Unit tests for models and services
+- `tests/acceptance/`: Acceptance tests for all features
 
+## Performance Goals
+
+- Search/filter/sort operations complete in under 2 seconds
+- Task creation with tags/priorities completes in under 5 seconds
+- Display operations complete in under 200ms
+
+## Technology Stack
+
+- Python 3.13+
+- Standard Python library only (no external dependencies)
+- In-memory storage only
+- Console-based interface
+
+## Testing
+
+Run unit tests:
+```bash
+python -m unittest discover -s tests/unit
 ```
-.
-├── src/
-│   ├── main.py          # Entry point and CLI interface
-│   ├── task_manager.py  # Task operations and validation
-│   ├── display.py       # Display formatting functions
-│   └── models.py        # Task data model
-├── specs/
-│   └── 1-todo-app/
-│       ├── spec.md      # Feature specification
-│       ├── plan.md      # Implementation plan
-│       └── checklists/
-│           └── requirements.md  # Quality checklist
-├── .specify/
-│   └── memory/
-│       └── constitution.md  # Project constitution
-├── README.md
-├── CLAUDE.md
-└── CONSTITUTION.md
+
+Run acceptance tests:
+```bash
+python -m unittest discover -s tests/acceptance
 ```
 
-## Notes
+## Backward Compatibility
 
-- All data is stored in memory only and will be lost when the application terminates
-- Task IDs are auto-generated as sequential numbers starting from 1
-- The application follows clean Python practices with type hints
+All Phase 1 functionality remains unchanged and fully functional. The new features are additive and do not break existing behavior.
