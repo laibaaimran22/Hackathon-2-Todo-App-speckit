@@ -1,80 +1,102 @@
-<!-- SYNC IMPACT REPORT
-Version change: 1.0.0 → 2.0.0
-Modified principles: All existing principles preserved as Phase 1-specific constraints
-Added sections: Project Overview, Multi-Phase Development Model, Reusable Intelligence Framework, Phase-Specific Constraints section
-Removed sections: None
-Templates requiring updates: ✅ Updated all templates to reflect multi-phase approach
-Follow-up TODOs: None
--->
+# Todo Evolution - Spec-Driven Development Hackathon Constitution
 
-# Project Constitution: Multi-Phase Task Management System
+## 1. PROJECT OVERVIEW
+- **Project Name:** Todo Evolution - Spec-Driven Development Hackathon
+- **Goal:** Build a progressively complex Todo application across 5 evolving phases, from a simple console app to a distributed cloud-native AI system.
+- **Approach:** Spec-driven development using Claude Code and SpecKit Plus.
+- **Repository Structure:** Single monorepo containing all phases in a centralized structure.
 
-## Project Overview
+## 2. FIVE PHASES DEFINITION
 
-This project is a multi-phase task management system designed to evolve from a foundational console-based application into an intelligent, automated system. The project will progress through multiple phases where early phases establish the foundational architecture and core functionality, while later phases introduce intelligence, automation, and advanced capabilities. Each phase builds upon the previous ones, ensuring backward compatibility and evolutionary growth.
+### Phase 1: In-Memory Python Console App (✅ COMPLETE)
+- **Technology:** Python 3.13+, UV
+- **Features:** 5 basic CRUD operations (Add, Delete, Update, View, Mark Complete).
+- **Storage:** In-memory (no database).
+- **Deliverable:** Command-line todo manager.
 
-## Multi-Phase Development Model
+### Phase 2: Full-Stack Web Application (🎯 CURRENT)
+- **Technology:** Next.js 15 (App Router), FastAPI, SQLModel, Neon PostgreSQL, Better Auth.
+- **Features:** Same 5 basic operations as web app with multi-user support.
+- **Architecture:** Monorepo with `frontend/` and `backend/` inside `Phase-2/`.
+- **Deliverable:** Full-stack web application with authentication and persistent storage.
 
-### Phase 1: Foundational Console-Based System
-Phase 1 establishes the core architecture with a console-based task management system that operates entirely in memory. This phase focuses on building solid foundational components, clean architecture, and specification-driven development practices.
+### Phase 3: AI-Powered Todo Chatbot
+- **Technology:** Phase 2 stack + OpenAI Agents SDK + Official MCP SDK.
+- **Features:** All Phase 2 features + Natural language conversational interface.
+- **Deliverable:** AI-powered conversational todo assistant.
 
-### Phase 2+: Intelligence and Capability Expansion
-Phases 2 and beyond focus on expanding the system's intelligence and capabilities while maintaining the foundational architecture established in Phase 1. Future phases must extend and enhance Phase 1 functionality without replacing or breaking existing guarantees. Specific feature details for each phase are documented in their respective specifications, not in this constitution.
+### Phase 4: Local Kubernetes Deployment
+- **Technology:** Phase 3 app + Docker, Minikube, Helm Charts, kubectl-ai, kagent.
+- **Features:** All Phase 3 features deployed on local Kubernetes.
+- **Deliverable:** Containerized orchestration on local Kubernetes.
 
-## Reusable Intelligence Framework
+### Phase 5: Advanced Cloud Deployment
+- **Technology:** Phase 4 stack + Kafka, Dapr, DigitalOcean DOKS.
+- **Features:** All Phase 4 features + Advanced features (Recurring tasks, Due dates, Priorities, Tags, Search, Filter, Sort).
+- **Deliverable:** Production-grade distributed system on cloud with event-driven architecture.
 
-The project emphasizes building reusable intelligence components including skills, templates, and sub-agents that can evolve from simple logic modules into sophisticated agents in later phases. Before coding implementation, reusable intelligence must be built and validated. This includes:
-- Pre-built templates for common operations
-- Reusable skill modules for task execution
-- Sub-agent patterns for autonomous operations
-- Standardized interfaces for component interaction
+## 3. GLOBAL DEVELOPMENT RULES
 
-## Core Principles
+### Spec-Driven Development
+- Every feature requires a specification BEFORE implementation.
+- Specifications must include: user stories, acceptance criteria, edge cases, and constraints.
+- No code should be written without an approved specification.
+- Use SpecKit Plus workflows for specification management.
 
-### Phase 1: In-Memory Data Constraint
-All task data must be stored in memory only using Python data structures (lists, dictionaries). No persistent storage mechanisms (files, databases, external storage) are permitted in Phase 1. Later phases may introduce persistence while maintaining in-memory compatibility.
+### Phase Implementation Order
+- Phases MUST be completed sequentially (1 → 2 → 3 → 4 → 5).
+- No skipping phases or working on multiple phases simultaneously.
+- A phase is considered complete only after full implementation and testing.
 
-### Specification-Driven Development
-All features must be traceable to a specification document. No implementation shall proceed without a clear, written specification that defines acceptance criteria. This principle applies to all phases of the project.
+### Repository Structure Rules
+- `specs/` folder at root level, organized by phase (e.g., `specs/Phase-1/`).
+- `history/` folder at root level for prompt history records.
+- `.claude/agents/` at root level, shared across ALL phases.
+- Each phase has a dedicated directory: `Phase-1/`, `Phase-2/`, etc.
+- Each phase directory must be self-contained.
+- Root directory remains clean, containing only configuration and phase folders.
 
-### Clean Code Architecture
-Code must follow clean code principles with clear separation of concerns. The application shall have a simple, maintainable structure with well-defined functions and classes. This principle applies to all phases of the project.
+### Agent Usage
+- Reusable agents in `.claude/agents/` are available for all phases.
+- **Core Agents:** full-stack-spec-writer, system-architecture-designer, frontend-architect-nextjs, api-backend-architect, db-schema-architect, auth-security-architect, api-contract-architect, state-management-architect, system-integration-architect, todo-quality-architect, fault-tolerance-architect, performance-optimization-architect.
 
-### Console-First Interface
-The application must maintain console-based interaction as the primary interface. Phase 1 is console-based only with clear, user-friendly text-based interaction. Future phases may add additional interfaces while preserving console functionality.
+## 4. CODE QUALITY STANDARDS (All Phases)
 
-### Minimal Technology Stack
-Use only Python 3.13+ and UV for dependency management in Phase 1. No additional frameworks or libraries beyond what's necessary for core functionality. Future phases may expand the technology stack while maintaining compatibility with foundational components.
+### Type Safety
+- **Frontend:** TypeScript (strict mode).
+- **Backend:** Pydantic models for validation; SQLModel for ORM.
 
-### Error Handling and Validation
-All functionality must include proper error handling and input validation. User inputs must be validated and clear error messages provided. This principle applies to all phases of the project.
+### Error Handling
+- Comprehensive try-catch blocks for async operations.
+- Proper HTTP status codes and user-friendly error messages.
+- Graceful degradation and resilience.
 
-## Phase-Specific Constraints
+### Security
+- JWT-based authentication (from Phase 2 onwards).
+- Input validation and sanitization.
+- SQL injection and XSS prevention.
+- Environment-based secret management (never committed to Git).
 
-### Phase 1 Constraints (Foundation Phase)
-- Data is lost when the application terminates (in-memory only)
-- Task IDs must be auto-generated and consistent within a session
-- No external service dependencies
-- Console-based interaction model only
-- No GUI or web interface components
-- Python 3.13+ with UV dependency management only
+### Testing
+- Unit tests for business logic.
+- Integration tests for API endpoints.
+- E2E tests for critical user flows.
+- Target: Minimum 70% code coverage.
 
-### Future Phase Constraints
-Later phases may introduce additional constraints through their specifications while maintaining compatibility with Phase 1 guarantees and constitutional principles.
+### Documentation
+- `README.md` in each phase directory.
+- OpenAPI/Swagger documentation for FastAPI backends.
+- Clear setup and deployment instructions.
 
-## Development Workflow
+## 5. TECHNOLOGY STACK BY PHASE
+- **Phase 1:** Python 3.13+, UV
+- **Phase 2:** Next.js 15, FastAPI, SQLModel, Neon PostgreSQL, Better Auth, Tailwind CSS
+- **Phase 3:** Phase 2 stack + OpenAI Agents SDK, Official MCP SDK
+- **Phase 4:** Phase 3 stack + Docker, Kubernetes (Minikube), Helm, kubectl-ai, kagent
+- **Phase 5:** Phase 4 stack + Apache Kafka, Dapr, DigitalOcean DOKS, GitHub Actions
 
-- Each feature must have a dedicated specification document in `/specs`
-- Specifications must include testable acceptance criteria
-- All specifications must be reviewed before implementation
-- Every implementation task must reference specific specification items
-- Follow PEP 8 style guide with type hints for all functions
-- Maintain backward compatibility with previous phases
-- Build reusable intelligence before implementation
-- Ensure phase-aware development practices
-
-## Governance
-
-This constitution establishes the foundational principles and governance framework for the Multi-Phase Task Management System. All development across all phases must comply with these constitutional principles. Constitutional amendments require explicit approval from project stakeholders and must be documented with clear rationale. Amendments must not break guarantees established in earlier phases without explicit justification and migration plans. Version number must be incremented according to semantic versioning rules. Regular compliance reviews ensure adherence to architectural boundaries and phase-specific constraints.
-
-**Version**: 2.0.0 | **Ratified**: 2025-01-01 | **Last Amended**: 2025-12-27
+## 6. DEPLOYMENT REQUIREMENTS
+- **Phase 1:** Local execution.
+- **Phase 2/3:** Frontend (Vercel), Backend (Vercel/Railway), Database (Neon).
+- **Phase 4:** Local Kubernetes (Minikube).
+- **Phase 5:** Production Kubernetes (DigitalOcean DOKS), Kafka (Redpanda Cloud).
