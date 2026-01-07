@@ -6,6 +6,12 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+# Remove quotes if they exist around the URL
+if DATABASE_URL and DATABASE_URL.startswith('"') and DATABASE_URL.endswith('"'):
+    DATABASE_URL = DATABASE_URL[1:-1]  # Remove leading and trailing quotes
+elif DATABASE_URL and DATABASE_URL.startswith("'") and DATABASE_URL.endswith("'"):
+    DATABASE_URL = DATABASE_URL[1:-1]  # Remove leading and trailing quotes
+
 # Neon requires SSL for connections - configure pool and SSL settings
 engine = create_engine(
     DATABASE_URL,
