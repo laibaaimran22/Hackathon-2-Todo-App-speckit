@@ -26,7 +26,7 @@ COPY . .
 EXPOSE ${PORT:-8000}
 
 # Create a script to run the application with error handling
-RUN echo '#!/bin/bash\nset -e\nif [ -z "$DATABASE_URL" ]; then\n  echo "ERROR: DATABASE_URL environment variable is not set!"\n  exit 1\nfi\nexec uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}' > run.sh && chmod +x run.sh
+RUN echo '#!/bin/bash\nset -e\nif [ -z "$DATABASE_URL" ]; then\n  echo "ERROR: DATABASE_URL environment variable is not set!"\n  exit 1\nfi\nexec python startup.py' > run.sh && chmod +x run.sh
 
 # Run the application
 CMD ["./run.sh"]
