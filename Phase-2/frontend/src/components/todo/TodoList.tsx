@@ -11,25 +11,28 @@ interface TodoListProps {
 }
 
 export function TodoList({ initialTodos }: TodoListProps) {
+    type OptimisticAction =
+        | { action: 'toggle'; id: string; data: { is_completed: boolean } }
+        | { action: 'delete'; id: string }
+        | { action: 'update'; id: string; data: { title?: string; description?: string } }
+        | { action: 'add'; data: Todo };
+
     const [optimisticTodos, addOptimisticTodo] = useOptimistic(
         initialTodos,
-        (state: Todo[], payload: { action: string; id: string; data?: any }) => {
-            const { action, id, data } = payload;
-            switch (action) {
+        (state: Todo[], action: OptimisticAction): Todo[] => {
+            switch (action.action) {
                 case "toggle":
                     return state.map((t) =>
-                        t.id === id ? { ...t, is_completed: data?.is_completed } : t
+                        t.id === action.id ? { ...t, is_completed: action.data.is_completed } : t
                     );
                 case "delete":
-                    return state.filter((t) => t.id !== id);
+                    return state.filter((t) => t.id !== action.id);
                 case "update":
                     return state.map((t) =>
-                        t.id === id ? { ...t, title: data?.title, description: data?.description } : t
+                        t.id === action.id ? { ...t, title: action.data.title ?? t.title, description: action.data.description ?? t.description } : t
                     );
                 case "add":
-                    return [data, ...state];
-                default:
-                    return state;
+                    return [action.data, ...state];
             }
         }
     );

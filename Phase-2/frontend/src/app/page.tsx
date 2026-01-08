@@ -128,7 +128,7 @@ export default function Home() {
 
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-              {stats.map((stat, index) => (
+              {stats.map((stat) => (
                 <div
                   key={stat.label}
                   className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 text-center"
