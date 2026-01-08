@@ -19,28 +19,6 @@ export const metadata: Metadata = {
   description: "Spec-driven authenticated todo application",
 };
 
-// Suppress Ed25519 experimental crypto warning from Better Auth
-if (typeof window !== 'undefined') {
-  // Store the original console.error
-  const originalError = console.error.bind(console);
-
-  // Override console.error to filter out the warning
-  console.error = function (...args: unknown[]) {
-    // Filter out Ed25519 and other crypto warnings
-    const message = args[0];
-    if (
-      typeof message === 'string' &&
-      (message.includes('Ed25519') ||
-       message.includes('crypto') ||
-       message.includes('experimental') ||
-       message.includes('Web Crypto API'))
-    ) {
-      return;
-    }
-    originalError(...args);
-  };
-}
-
 export default function RootLayout({
   children,
 }: Readonly<{
