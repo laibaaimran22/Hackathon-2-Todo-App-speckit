@@ -14,12 +14,10 @@ const db = new Kysely({
 export const auth = betterAuth({
     database: {
         provider: "pg",
-        db: db as any,
+        db,
     },
     plugins: [
-        jwt({
-            secret: process.env.JWT_SECRET || "development-secret-key-change-me",
-        } as any)
+        jwt()
     ],
     emailAndPassword: {
         enabled: true

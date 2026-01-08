@@ -46,7 +46,7 @@ export default function SignupPage() {
         });
         setLoading(false);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Signup error:", err);
       const errorMsg = "An unexpected error occurred. Please try again.";
       setError(errorMsg);

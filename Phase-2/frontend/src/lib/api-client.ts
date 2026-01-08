@@ -37,7 +37,7 @@ export async function apiClient<T>(
   }
 
   // Destructure headers out of options to prevent override
-  const { headers: _headers, ...restOptions } = options;
+  const { headers: optionsHeaders, ...restOptions } = options;
 
   const response = await fetch(url, {
     ...restOptions,

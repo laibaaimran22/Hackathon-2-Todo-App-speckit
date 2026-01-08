@@ -112,7 +112,7 @@ export default async function DashboardPage() {
                 Welcome back, {userName}!
               </h2>
               <p className="text-lg text-white/60">
-                Let's make today productive and achieve your goals
+                Let&apos;s make today productive and achieve your goals
               </p>
             </div>
 
@@ -183,7 +183,7 @@ export default async function DashboardPage() {
                 <div className="mt-8 pt-6 border-t border-white/10">
                   <h4 className="text-sm font-semibold text-white/70 mb-4 flex items-center gap-2">
                     <TrendingUp className="w-4 h-4" />
-                    Today's Progress
+                    Today&apos;s Progress
                   </h4>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">

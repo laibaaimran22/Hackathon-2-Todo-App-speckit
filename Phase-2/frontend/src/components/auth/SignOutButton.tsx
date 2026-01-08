@@ -22,7 +22,7 @@ export function SignOutButton() {
             toast.success("Signed out successfully!", {
                 description: "See you again soon!",
             });
-        } catch (error) {
+        } catch (_error) {
             // Show toast even on error since we'll sign out anyway
             toast.info("Signed out", {
                 description: "You've been signed out.",

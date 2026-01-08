@@ -1,7 +1,5 @@
 "use server";
 
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 import { apiClient } from "@/lib/api-client";
 import { revalidatePath } from "next/cache";
 import { getJwtToken } from "@/lib/auth-utils";

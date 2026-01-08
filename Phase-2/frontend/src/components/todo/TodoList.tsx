@@ -13,17 +13,18 @@ interface TodoListProps {
 export function TodoList({ initialTodos }: TodoListProps) {
     const [optimisticTodos, addOptimisticTodo] = useOptimistic(
         initialTodos,
-        (state: Todo[], { action, id, data }: any) => {
+        (state: Todo[], payload: { action: string; id: string; data?: any }) => {
+            const { action, id, data } = payload;
             switch (action) {
                 case "toggle":
                     return state.map((t) =>
-                        t.id === id ? { ...t, is_completed: data.is_completed } : t
+                        t.id === id ? { ...t, is_completed: data?.is_completed } : t
                     );
                 case "delete":
                     return state.filter((t) => t.id !== id);
                 case "update":
                     return state.map((t) =>
-                        t.id === id ? { ...t, title: data.title, description: data.description } : t
+                        t.id === id ? { ...t, title: data?.title, description: data?.description } : t
                     );
                 case "add":
                     return [data, ...state];

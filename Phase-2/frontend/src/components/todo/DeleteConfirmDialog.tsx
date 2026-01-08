@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AlertTriangle, X, Trash2, Loader2 } from "lucide-react";
+import { AlertTriangle, Trash2, Loader2 } from "lucide-react";
 
 interface DeleteConfirmDialogProps {
   isOpen: boolean;

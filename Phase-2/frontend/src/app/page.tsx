@@ -9,9 +9,6 @@ import {
   Users,
   ArrowRight,
   Sparkles,
-  LayoutDashboard,
-  Lock,
-  ChevronRight,
   Play
 } from "lucide-react";
 
@@ -149,7 +146,7 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-6">
             {features.map((feature, index) => (
               <div
-                key={feature.title}
+                key={`${feature.title}-${index}`}
                 onMouseEnter={() => setActiveFeature(index)}
                 className={`group p-8 rounded-3xl bg-white/5 backdrop-blur-sm border transition-all duration-300 cursor-pointer ${
                   activeFeature === index
