@@ -1,17 +1,17 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Suppress experimental feature warnings
-  experimental: {
-    serverMinification: true,
-    // Handle route groups properly during build
-    typedRoutes: false, // Disable typed routes which can cause issues with route groups
-  },
+  // Updated for Next.js 16 compatibility
+  typedRoutes: false, // Moved from experimental
 
-  // Suppress console warnings in development
-  webpack: (config) => {
+  // Enable Turbopack compatibility
+  webpack: (config, { dev, isServer }) => {
+    // Return config as-is, but make it compatible with Turbopack
     return config;
   },
+
+  // Empty turbopack config to satisfy the requirement
+  turbopack: {},
 };
 
 export default nextConfig;
