@@ -4,9 +4,9 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { apiClient } from "@/lib/api-client";
 import { Todo } from "@/types";
-import { AddTodoForm } from "@/components/todo/AddTodoForm";
-import { SignOutButton } from "@/components/auth/SignOutButton";
-import { TodoDataSection } from "@/components/todo/TodoDataSection";
+import { ClientAddTodoForm } from "@/components/todo/ClientAddTodoForm";
+import { ClientSignOutButton } from "@/components/auth/ClientSignOutButton";
+import { ClientTodoDataSection } from "@/components/todo/ClientTodoDataSection";
 import { getJwtToken } from "@/lib/auth-utils";
 import {
   CheckCircle2,
@@ -94,7 +94,7 @@ export default async function DashboardPage() {
                 </div>
                 <span className="text-sm font-medium text-white/90">{userName}</span>
               </div>
-              <SignOutButton />
+              <ClientSignOutButton />
             </div>
           </div>
         </div>
@@ -162,7 +162,7 @@ export default async function DashboardPage() {
                   ))}
                 </div>
               }>
-                <TodoDataSection todos={todos} />
+                <ClientTodoDataSection todos={todos} />
               </Suspense>
             </section>
           </div>
@@ -177,7 +177,7 @@ export default async function DashboardPage() {
                   </div>
                   <h3 className="text-xl font-bold text-white">Add New Task</h3>
                 </div>
-                <AddTodoForm />
+                <ClientAddTodoForm />
 
                 {/* Quick Stats */}
                 <div className="mt-8 pt-6 border-t border-white/10">
