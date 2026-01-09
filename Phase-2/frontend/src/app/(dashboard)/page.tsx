@@ -1,11 +1,9 @@
+import { Suspense } from "react";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-import { Suspense } from "react";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { apiClient } from "@/lib/api-client";
-import { Todo } from "@/types";
 import { ClientTodoSection } from "@/components/todo/ClientTodoSection";
 import { ClientAddTodoForm } from "@/components/todo/ClientAddTodoForm";
 import { ClientSignOutButton } from "@/components/auth/ClientSignOutButton";
