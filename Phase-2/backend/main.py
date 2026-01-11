@@ -12,10 +12,13 @@ from auth import get_current_user_id
 
 load_dotenv()
 
+# Configure app for Hugging Face Spaces
 app = FastAPI(
     title="Todo Evolution API",
     description="Phase 2 Backend: Authenticated REST API for Todo Management",
-    version="1.0.0"
+    version="1.0.0",
+    # Add root_path for reverse proxy (like Hugging Face Spaces)
+    root_path="/spaces/laibaaaimran/new-backend" if os.getenv("HF_SPACE_ID") else ""
 )
 
 # Initialize DB on startup
