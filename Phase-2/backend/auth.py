@@ -37,10 +37,10 @@ def get_current_user_id(authorization: HTTPAuthorizationCredentials = Depends(se
             raise credentials_exception
 
         # Get the shared secret used by Better Auth for JWT signing
-        # Better Auth JWT plugin uses JWT_SECRET for signing
-        shared_secret = os.getenv("JWT_SECRET") or os.getenv("BETTER_AUTH_SECRET")
+        # Use BETTER_AUTH_SECRET first (matches frontend), fallback to JWT_SECRET
+        shared_secret = os.getenv("BETTER_AUTH_SECRET") or os.getenv("JWT_SECRET")
         if not shared_secret:
-            print("[DEBUG] No JWT_SECRET or BETTER_AUTH_SECRET found in environment")
+            print("[DEBUG] No BETTER_AUTH_SECRET or JWT_SECRET found in environment")
             raise credentials_exception
 
         print(f"[DEBUG] Using secret: {shared_secret[:20]}...")

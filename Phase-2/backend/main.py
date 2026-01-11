@@ -23,12 +23,13 @@ app = FastAPI(
 def on_startup():
     init_db()
 
-# CORS Configuration
-origins = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+# CORS Configuration - Split comma-separated string into list
+cors_origins_str = os.getenv("CORS_ORIGINS", "http://localhost:3000")
+cors_origins = [origin.strip() for origin in cors_origins_str.split(",")]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=cors_origins,  # Now a proper list
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
