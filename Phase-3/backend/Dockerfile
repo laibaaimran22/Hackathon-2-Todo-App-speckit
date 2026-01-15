@@ -23,7 +23,7 @@ RUN pip install --no-cache-dir "uvicorn[standard]"
 COPY . .
 
 # Expose port (Hugging Face Spaces uses PORT environment variable)
-EXPOSE ${PORT:-8000}
+EXPOSE 8000
 
 # Create a script to run the application with error handling
 RUN echo '#!/bin/bash\nset -e\nif [ -z "$DATABASE_URL" ]; then\n  echo "ERROR: DATABASE_URL environment variable is not set!"\n  exit 1\nfi\nexec python startup.py' > run.sh && chmod +x run.sh

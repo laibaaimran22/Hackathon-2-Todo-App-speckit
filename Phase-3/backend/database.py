@@ -6,11 +6,20 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Remove quotes if they exist around the URL
-if DATABASE_URL and DATABASE_URL.startswith('"') and DATABASE_URL.endswith('"'):
-    DATABASE_URL = DATABASE_URL[1:-1]  # Remove leading and trailing quotes
-elif DATABASE_URL and DATABASE_URL.startswith("'") and DATABASE_URL.endswith("'"):
-    DATABASE_URL = DATABASE_URL[1:-1]  # Remove leading and trailing quotes
+# Remove quotes if they exist around the URL (handles various quote scenarios)
+if DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.strip()  # Remove leading/trailing whitespace
+    # Remove surrounding quotes (single or double)
+    if (DATABASE_URL.startswith('"') and DATABASE_URL.endswith('"')) or \
+       (DATABASE_URL.startswith("'") and DATABASE_URL.endswith("'")):
+        DATABASE_URL = DATABASE_URL[1:-1]
+    # Also handle case where only leading quote exists
+    if DATABASE_URL.startswith('"') or DATABASE_URL.startswith("'"):
+        DATABASE_URL = DATABASE_URL[1:]
+    if DATABASE_URL.endswith('"') or DATABASE_URL.endswith("'"):
+        DATABASE_URL = DATABASE_URL[:-1]
+    # Strip again after quote removal
+    DATABASE_URL = DATABASE_URL.strip()
 
 # Neon requires SSL for connections - configure pool and SSL settings
 engine = create_engine(

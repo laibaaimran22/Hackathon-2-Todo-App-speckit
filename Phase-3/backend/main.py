@@ -5,6 +5,9 @@ from typing import List
 import os
 from datetime import datetime, timezone
 from dotenv import load_dotenv
+from pydantic import BaseModel
+from jose import jwt
+import secrets
 
 from database import engine, get_session, init_db
 from models import Task, TaskCreate, TaskRead, TaskUpdate, User
@@ -50,6 +53,91 @@ app.add_middleware(
 
 # Mount MCP server under /mcp path
 app.mount("/mcp", mcp_app)
+
+class AuthRequest(BaseModel):
+    email: str
+    password: str
+
+@app.post("/api/auth/sign-in/email")
+async def sign_in_email(request: AuthRequest):
+    # Simulate authentication - in a real app, you'd verify credentials
+    # For demo purposes, we'll generate a JWT token
+    secret = os.getenv("JWT_SECRET") or os.getenv("BETTER_AUTH_SECRET")
+    if not secret:
+        raise HTTPException(status_code=500, detail="Auth secret not configured")
+
+    # Create a simple JWT token with user info
+    token_data = {
+        "sub": f"user_{secrets.token_hex(8)}",  # Unique user ID
+        "email": request.email,
+        "exp": datetime.now(timezone.utc).timestamp() + 86400 * 7,  # 7 days expiry
+        "iat": datetime.now(timezone.utc).timestamp()
+    }
+
+    token = jwt.encode(token_data, secret, algorithm="HS256")
+
+    return {
+        "session": {
+            "token": token,
+            "expiresAt": datetime.now(timezone.utc).timestamp() + 86400 * 7
+        },
+        "user": {
+            "id": token_data["sub"],
+            "email": request.email
+        }
+    }
+
+@app.post("/api/auth/sign-up/email")
+async def sign_up_email(request: AuthRequest):
+    # For simplicity, treat sign up same as sign in
+    secret = os.getenv("JWT_SECRET") or os.getenv("BETTER_AUTH_SECRET")
+    if not secret:
+        raise HTTPException(status_code=500, detail="Auth secret not configured")
+
+    token_data = {
+        "sub": f"user_{secrets.token_hex(8)}",  # Unique user ID
+        "email": request.email,
+        "exp": datetime.now(timezone.utc).timestamp() + 86400 * 7,  # 7 days expiry
+        "iat": datetime.now(timezone.utc).timestamp()
+    }
+
+    token = jwt.encode(token_data, secret, algorithm="HS256")
+
+    return {
+        "session": {
+            "token": token,
+            "expiresAt": datetime.now(timezone.utc).timestamp() + 86400 * 7
+        },
+        "user": {
+            "id": token_data["sub"],
+            "email": request.email
+        }
+    }
+
+@app.post("/api/auth/sign-out")
+async def sign_out():
+    return {"success": True}
+
+@app.get("/api/auth/user")
+async def get_user(current_user_id: str = Depends(get_current_user_id)):
+    # Return user info based on the authenticated user
+    return {
+        "id": current_user_id,
+        "email": f"{current_user_id}@example.com"
+    }
+
+@app.get("/")
+async def root():
+    return {
+        "message": "Todo Evolution Backend API",
+        "version": "1.0.0",
+        "endpoints": {
+            "health": "/health",
+            "auth": "/api/auth",
+            "tasks": "/api/tasks",
+            "mcp": "/mcp/"
+        }
+    }
 
 @app.get("/health")
 async def health_check():
