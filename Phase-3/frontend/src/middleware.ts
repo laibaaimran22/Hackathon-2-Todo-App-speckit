@@ -1,7 +1,22 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
+  // Proxy auth requests to backend
+  if (request.nextUrl.pathname.startsWith('/api/auth/')) {
+    const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    if (backendUrl) {
+      const url = new URL(request.url);
+      const backend = new URL(backendUrl);
+
+      // Change the host to point to backend
+      url.protocol = backend.protocol;
+      url.host = backend.host;
+
+      return NextResponse.rewrite(url);
+    }
+  }
+
+  // Existing auth logic
   const sessionCookie = request.cookies.get('better-auth.session_token');
   const isAuthPage = request.nextUrl.pathname.startsWith('/login') ||
                      request.nextUrl.pathname.startsWith('/signup');
@@ -19,5 +34,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login', '/signup'],
+  matcher: ['/api/auth/:path*', '/dashboard/:path*', '/login', '/signup'],
 };
