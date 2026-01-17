@@ -1,6 +1,5 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { LogOut, Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -16,7 +15,18 @@ export function SignOutButton() {
         setIsPending(true);
 
         try {
-            await authClient.signOut();
+            // Directly call backend signout endpoint
+            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/sign-out`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            // Clear the stored token from localStorage
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('auth-token');
+            }
 
             // Show success toast
             toast.success("Signed out successfully!", {
@@ -24,6 +34,11 @@ export function SignOutButton() {
             });
         } catch (error) {
             console.error("Sign out error:", error);
+            // Clear the stored token from localStorage even if backend call fails
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('auth-token');
+            }
+
             // Show toast even on error since we'll sign out anyway
             toast.info("Signed out", {
                 description: "You've been signed out.",

@@ -9,12 +9,23 @@ export async function apiClient<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
+  // Retrieve auth token from localStorage
+  let token = null;
+  if (typeof window !== 'undefined') {
+    token = localStorage.getItem('auth-token');
+  }
+
   const url = `${BASE_URL}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
 
   // Merge headers properly - Authorization header should be preserved
   const headers = new Headers({
     "Content-Type": "application/json",
   });
+
+  // Add authorization header if token exists
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
 
   // If options.headers exists, add them to our headers object
   if (options.headers) {

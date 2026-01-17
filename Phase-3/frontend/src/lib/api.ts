@@ -1,12 +1,19 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
-  // This function is kept for general API calls
-  // For authenticated calls, use server actions that have access to JWT tokens
-  // Better Auth client session may not directly expose JWT tokens
+  // Retrieve auth token from localStorage
+  let token = null;
+  if (typeof window !== 'undefined') {
+    token = localStorage.getItem('auth-token');
+  }
 
   const headers = new Headers(options.headers);
   headers.set('Content-Type', 'application/json');
+
+  // Add authorization header if token exists
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
 
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,

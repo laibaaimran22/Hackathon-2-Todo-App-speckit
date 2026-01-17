@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
 import { Sparkles, Mail, Lock, User, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -24,22 +23,35 @@ export default function SignupPage() {
     setError("");
 
     try {
-      const result = await authClient.signUp.email({
-        email,
-        password,
-        name,
+      // Directly call backend auth endpoint instead of using Better Auth
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/sign-up/email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
       });
 
-      if (result.data) {
-        // Success - show toast and redirect
+      const result = await response.json();
+
+      if (response.ok) {
+        // Success - store token in localStorage/sessionStorage if needed
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('auth-token', result.session.token);
+        }
+
+        // Show success toast and redirect
         toast.success("Account created successfully!", {
           description: "Welcome to Todo Evolution! Redirecting...",
         });
 
         // Use replace for faster navigation
         router.replace("/dashboard");
-      } else if (result.error) {
-        const errorMsg = result.error.message || "Could not create account";
+      } else {
+        const errorMsg = result.detail || result.message || "Could not create account";
         setError(errorMsg);
         toast.error("Sign up failed", {
           description: errorMsg,
