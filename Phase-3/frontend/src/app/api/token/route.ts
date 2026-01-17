@@ -1,21 +1,17 @@
 import { NextRequest } from 'next/server';
-import { getJwtToken } from '@/lib/auth-utils';
-import { auth } from '@/lib/auth';
+import { cookies } from 'next/headers';
 
 export async function GET(request: NextRequest) {
   try {
-    // Get the session using Better Auth
-    const session = await auth.api.getSession({
-      headers: request.headers,
-    });
+    // Get the auth token from cookies that was stored during login
+    const cookieStore = await cookies();
+    const token = cookieStore.get('auth-token')?.value;
 
-    if (!session || !session.session) {
+    if (!token) {
       return Response.json({ error: 'No active session' }, { status: 401 });
     }
 
-    // Generate JWT token using the server-side utility
-    const token = await getJwtToken();
-
+    // Return the token that's stored in cookies
     return Response.json({ token });
   } catch (error) {
     console.error('Error getting token:', error);

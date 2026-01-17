@@ -9,16 +9,10 @@ export async function apiClient<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  // Retrieve auth token by calling the token endpoint
+  // Retrieve auth token from localStorage
   let token = null;
-  try {
-    const tokenResponse = await fetch('/api/token');
-    if (tokenResponse.ok) {
-      const tokenData = await tokenResponse.json();
-      token = tokenData.token;
-    }
-  } catch (error) {
-    console.error('Failed to retrieve token:', error);
+  if (typeof window !== 'undefined') {
+    token = localStorage.getItem('auth-token');
   }
 
   const url = `${BASE_URL}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
@@ -61,6 +55,14 @@ export async function apiClient<T>(
     ...optionsWithoutHeaders,
     headers,
   });
+
+  // If we get a 401 or 403, clear the token as it might be invalid/expired
+  if (response.status === 401 || response.status === 403) {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('auth-token');
+      document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+  }
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
