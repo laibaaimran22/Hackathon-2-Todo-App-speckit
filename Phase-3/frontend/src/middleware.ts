@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
       const url = new URL(request.url);
       const backend = new URL(backendUrl);
 
-      // Change the host to point to backend
+      // Change the host to point to backend while preserving path and query
       url.protocol = backend.protocol;
       url.host = backend.host;
 
