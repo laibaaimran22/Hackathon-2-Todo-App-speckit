@@ -1,15 +1,25 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { apiClient } from "@/lib/api-client";
 import { Todo } from "@/types";
 import { DashboardClient } from "./DashboardClient";
 
 async function getTodos(token: string): Promise<Todo[]> {
   try {
-    const data = await apiClient<Todo[]>("/api/tasks", {
-      headers: { "Authorization": `Bearer ${token}` },
+    // Direct server-side API call with the token
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tasks`, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
       next: { revalidate: 0 }
     });
+
+    if (!response.ok) {
+      console.error(`Failed to fetch todos: ${response.status} ${response.statusText}`);
+      return [];
+    }
+
+    const data = await response.json();
     return data;
   } catch (error) {
     console.error("Failed to fetch todos:", error);

@@ -7,11 +7,12 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export async function apiClient<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  tokenOverride?: string | null // Allow token to be passed explicitly for server-side calls
 ): Promise<T> {
-  // Retrieve auth token from localStorage
-  let token = null;
-  if (typeof window !== 'undefined') {
+  // Retrieve auth token from localStorage if not overridden
+  let token: string | undefined | null = tokenOverride;
+  if (!token && typeof window !== 'undefined') {
     token = localStorage.getItem('auth-token');
   }
 
@@ -22,8 +23,8 @@ export async function apiClient<T>(
     "Content-Type": "application/json",
   });
 
-  // Add authorization header if token exists
-  if (token) {
+  // Add authorization header if token exists and is valid
+  if (token && token !== 'null' && token !== 'undefined' && token.trim() !== '') {
     headers.set('Authorization', `Bearer ${token}`);
   }
 
@@ -58,7 +59,7 @@ export async function apiClient<T>(
 
   // If we get a 401 or 403, clear the token as it might be invalid/expired
   if (response.status === 401 || response.status === 403) {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && !tokenOverride) { // Only clear if not using override
       localStorage.removeItem('auth-token');
       document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     }

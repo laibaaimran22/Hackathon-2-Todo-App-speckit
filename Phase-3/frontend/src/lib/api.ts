@@ -2,7 +2,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
   // Retrieve auth token from localStorage
-  let token = null;
+  let token: string | null = null;
   if (typeof window !== 'undefined') {
     token = localStorage.getItem('auth-token');
   }
@@ -10,8 +10,8 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
   const headers = new Headers(options.headers);
   headers.set('Content-Type', 'application/json');
 
-  // Add authorization header if token exists
-  if (token) {
+  // Add authorization header if token exists and is valid
+  if (token && token !== 'null' && token !== 'undefined' && token.trim() !== '') {
     headers.set('Authorization', `Bearer ${token}`);
   }
 
