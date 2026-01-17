@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function middleware(request: NextRequest) {
   // Proxy auth requests to backend
   if (request.nextUrl.pathname.startsWith('/api/auth/')) {
-    const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL;
     if (backendUrl) {
       const url = new URL(request.url);
       const backend = new URL(backendUrl);
