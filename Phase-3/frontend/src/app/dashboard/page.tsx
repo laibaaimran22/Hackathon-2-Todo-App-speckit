@@ -11,18 +11,20 @@ async function getTodos(token: string): Promise<Todo[]> {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json"
       },
-      next: { revalidate: 0 }
+      cache: 'no-store' // Disable caching for fresh data
     });
 
     if (!response.ok) {
       console.error(`Failed to fetch todos: ${response.status} ${response.statusText}`);
+      // Return an empty array if there's an error, but log the error
       return [];
     }
 
     const data = await response.json();
-    return data;
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error("Failed to fetch todos:", error);
+    // Return empty array in case of error to prevent server component crashes
     return [];
   }
 }
