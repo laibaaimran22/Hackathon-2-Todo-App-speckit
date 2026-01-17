@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 import { Sparkles, Mail, Lock, User, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -23,40 +24,22 @@ export default function SignupPage() {
     setError("");
 
     try {
-      // Directly call backend auth endpoint instead of using Better Auth
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/sign-up/email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+      const result = await authClient.signUp.email({
+        email,
+        password,
+        name,
       });
 
-      const result = await response.json();
-
-      if (response.ok) {
-        // Success - store token in localStorage and cookie for middleware
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('auth-token', result.session.token);
-
-          // Set a cookie that the middleware can read
-          document.cookie = `auth-token=${result.session.token}; path=/; max-age=604800; SameSite=Lax`; // 7 days
-        }
-
-        // Show success toast and redirect
+      if (result.data) {
+        // Success - show toast and redirect
         toast.success("Account created successfully!", {
           description: "Welcome to Todo Evolution! Redirecting...",
         });
 
-        // Small delay to ensure state is properly set before redirect
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 100);
-      } else {
-        const errorMsg = result.detail || result.message || "Could not create account";
+        // Use replace for faster navigation
+        router.replace("/dashboard");
+      } else if (result.error) {
+        const errorMsg = result.error.message || "Could not create account";
         setError(errorMsg);
         toast.error("Sign up failed", {
           description: errorMsg,

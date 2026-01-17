@@ -37,10 +37,15 @@ def get_current_user_id(authorization: HTTPAuthorizationCredentials = Depends(se
             raise credentials_exception
 
         # Get the shared secret used by Better Auth for JWT signing
-        # Use BETTER_AUTH_SECRET first (matches frontend), fallback to JWT_SECRET
-        shared_secret = os.getenv("BETTER_AUTH_SECRET") or os.getenv("JWT_SECRET")
+        # Check multiple possible environment variable names
+        shared_secret = (
+            os.getenv("BETTER_AUTH_SECRET") or
+            os.getenv("better_auth_secret") or  # lowercase variant
+            os.getenv("JWT_SECRET") or
+            os.getenv("jwt_secret")  # lowercase variant
+        )
         if not shared_secret:
-            print("[DEBUG] No BETTER_AUTH_SECRET or JWT_SECRET found in environment")
+            print("[DEBUG] No BETTER_AUTH_SECRET, better_auth_secret, JWT_SECRET, or jwt_secret found in environment")
             raise credentials_exception
 
         print(f"[DEBUG] Using secret: {shared_secret[:20]}...")
@@ -114,10 +119,15 @@ def get_current_user_id_from_token(token: str) -> str:
             return None
 
         # Get the shared secret used by Better Auth for JWT signing
-        # Use BETTER_AUTH_SECRET first (matches frontend), fallback to JWT_SECRET
-        shared_secret = os.getenv("BETTER_AUTH_SECRET") or os.getenv("JWT_SECRET")
+        # Check multiple possible environment variable names
+        shared_secret = (
+            os.getenv("BETTER_AUTH_SECRET") or
+            os.getenv("better_auth_secret") or  # lowercase variant
+            os.getenv("JWT_SECRET") or
+            os.getenv("jwt_secret")  # lowercase variant
+        )
         if not shared_secret:
-            print("[DEBUG] No BETTER_AUTH_SECRET or JWT_SECRET found in environment")
+            print("[DEBUG] No BETTER_AUTH_SECRET, better_auth_secret, JWT_SECRET, or jwt_secret found in environment")
             return None
 
         print(f"[DEBUG] Using secret: {shared_secret[:20]}...")

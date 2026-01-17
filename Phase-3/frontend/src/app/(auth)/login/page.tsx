@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 import { Sparkles, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -22,40 +23,21 @@ export default function LoginPage() {
     setError("");
 
     try {
-      // Directly call backend auth endpoint instead of using Better Auth
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/sign-in/email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+      const result = await authClient.signIn.email({
+        email,
+        password,
       });
 
-      const result = await response.json();
-
-      if (response.ok) {
-        // Success - store token in localStorage and cookie for middleware
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('auth-token', result.session.token);
-
-          // Set a cookie that the middleware can read
-          document.cookie = `auth-token=${result.session.token}; path=/; max-age=604800; SameSite=Lax`; // 7 days
-        }
-
-        // Show success toast and redirect
+      if (result.data) {
+        // Success - show toast and redirect
         toast.success("Successfully signed in!", {
           description: "Welcome back! Redirecting to dashboard...",
         });
 
-        // Small delay to ensure state is properly set before redirect
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 100);
-      } else {
-        const errorMsg = result.detail || result.message || "Invalid credentials";
+        // Use replace for faster navigation (no history entry)
+        router.replace("/dashboard");
+      } else if (result.error) {
+        const errorMsg = result.error.message || "Invalid credentials";
         setError(errorMsg);
         toast.error("Sign in failed", {
           description: errorMsg,

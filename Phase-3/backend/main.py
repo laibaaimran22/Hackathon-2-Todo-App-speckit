@@ -62,7 +62,13 @@ class AuthRequest(BaseModel):
 async def sign_in_email(request: AuthRequest):
     # Simulate authentication - in a real app, you'd verify credentials
     # For demo purposes, we'll generate a JWT token
-    secret = os.getenv("JWT_SECRET") or os.getenv("BETTER_AUTH_SECRET")
+    # Get the shared secret using the same logic as auth.py to handle multiple possible environment variable names
+    secret = (
+        os.getenv("BETTER_AUTH_SECRET") or
+        os.getenv("better_auth_secret") or  # lowercase variant
+        os.getenv("JWT_SECRET") or
+        os.getenv("jwt_secret")  # lowercase variant
+    )
     if not secret:
         raise HTTPException(status_code=500, detail="Auth secret not configured")
 
@@ -90,7 +96,13 @@ async def sign_in_email(request: AuthRequest):
 @app.post("/api/auth/sign-up/email")
 async def sign_up_email(request: AuthRequest):
     # For simplicity, treat sign up same as sign in
-    secret = os.getenv("JWT_SECRET") or os.getenv("BETTER_AUTH_SECRET")
+    # Get the shared secret using the same logic as auth.py to handle multiple possible environment variable names
+    secret = (
+        os.getenv("BETTER_AUTH_SECRET") or
+        os.getenv("better_auth_secret") or  # lowercase variant
+        os.getenv("JWT_SECRET") or
+        os.getenv("jwt_secret")  # lowercase variant
+    )
     if not secret:
         raise HTTPException(status_code=500, detail="Auth secret not configured")
 

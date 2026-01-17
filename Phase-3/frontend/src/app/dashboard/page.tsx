@@ -1,7 +1,9 @@
-import { cookies } from "next/headers";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { apiClient } from "@/lib/api-client";
 import { Todo } from "@/types";
+import { getJwtToken } from "@/lib/auth-utils";
 import { DashboardClient } from "./DashboardClient";
 
 async function getTodos(token: string): Promise<Todo[]> {
@@ -17,42 +19,27 @@ async function getTodos(token: string): Promise<Todo[]> {
   }
 }
 
-async function getUserInfoAndToken() {
-  // Get the auth token from cookies
-  const cookieStore = await cookies();
-  const token = cookieStore.get('auth-token')?.value;
+async function getSessionAndToken() {
+  const session = await auth.api.getSession({
+    headers: await headers()
+  });
 
-  if (!token) {
-    return { userInfo: null, token: "" };
+  if (!session?.session) {
+    return { session: null, token: "" };
   }
 
-  try {
-    // Verify the token by making a request to the backend
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/user`, {
-      headers: { "Authorization": `Bearer ${token}` },
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return { userInfo: null, token: "" };
-    }
-
-    const userData = await response.json();
-    return { userInfo: userData, token };
-  } catch (error) {
-    console.error("Failed to verify token:", error);
-    return { userInfo: null, token: "" };
-  }
+  const token = await getJwtToken();
+  return { session, token };
 }
 
 export default async function DashboardPage() {
-  const { userInfo, token } = await getUserInfoAndToken();
+  const { session, token } = await getSessionAndToken();
 
-  if (!token) {
+  if (!session?.session) {
     redirect("/login");
   }
 
-  const userEmail = userInfo?.email || userInfo?.user?.email || "User";
+  const userEmail = session?.user?.email || "User";
   const todos = token ? await getTodos(token) : [];
 
   return (
