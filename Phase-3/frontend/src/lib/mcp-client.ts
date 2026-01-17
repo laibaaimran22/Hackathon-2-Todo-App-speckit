@@ -24,8 +24,10 @@ export class MCPClient {
   private baseUrl: string;
 
   constructor(baseUrl?: string) {
-    // Use environment variable or default to /mcp for local development
-    this.baseUrl = baseUrl || process.env.NEXT_PUBLIC_MCP_BASE_URL || '/mcp';
+    // Use environment variable or default to backend /mcp endpoint for production
+    // Ensure proper URL formatting by removing trailing slash from API URL if present
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '') || '';
+    this.baseUrl = baseUrl || process.env.NEXT_PUBLIC_MCP_BASE_URL || `${apiUrl}/mcp`;
   }
 
   async getTools(): Promise<any[]> {
