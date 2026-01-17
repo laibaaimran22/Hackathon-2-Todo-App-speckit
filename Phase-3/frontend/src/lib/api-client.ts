@@ -56,6 +56,14 @@ export async function apiClient<T>(
     headers,
   });
 
+  // If we get a 401 or 403, clear the token as it might be invalid/expired
+  if (response.status === 401 || response.status === 403) {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('auth-token');
+      document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+  }
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.detail || `API Error: ${response.status} ${response.statusText}`);

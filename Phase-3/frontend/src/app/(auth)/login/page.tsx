@@ -50,8 +50,10 @@ export default function LoginPage() {
           description: "Welcome back! Redirecting to dashboard...",
         });
 
-        // Use replace for faster navigation (no history entry)
-        router.replace("/dashboard");
+        // Small delay to ensure state is properly set before redirect
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 100);
       } else {
         const errorMsg = result.detail || result.message || "Invalid credentials";
         setError(errorMsg);

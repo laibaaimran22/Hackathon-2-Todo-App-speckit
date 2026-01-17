@@ -51,8 +51,10 @@ export default function SignupPage() {
           description: "Welcome to Todo Evolution! Redirecting...",
         });
 
-        // Use replace for faster navigation
-        router.replace("/dashboard");
+        // Small delay to ensure state is properly set before redirect
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 100);
       } else {
         const errorMsg = result.detail || result.message || "Could not create account";
         setError(errorMsg);

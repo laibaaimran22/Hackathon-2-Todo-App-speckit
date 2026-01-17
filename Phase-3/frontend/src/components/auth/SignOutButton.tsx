@@ -46,8 +46,10 @@ export function SignOutButton() {
                 description: "You've been signed out.",
             });
         } finally {
-            // Use replace for faster navigation without history entry
-            router.replace("/");
+            // Small delay to ensure state is properly cleared before redirect
+            setTimeout(() => {
+              router.push("/");
+            }, 100);
         }
     };
 
