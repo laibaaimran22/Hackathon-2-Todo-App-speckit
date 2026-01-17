@@ -38,9 +38,12 @@ export default function SignupPage() {
       const result = await response.json();
 
       if (response.ok) {
-        // Success - store token in localStorage/sessionStorage if needed
+        // Success - store token in localStorage and cookie for middleware
         if (typeof window !== 'undefined') {
           localStorage.setItem('auth-token', result.session.token);
+
+          // Set a cookie that the middleware can read
+          document.cookie = `auth-token=${result.session.token}; path=/; max-age=604800; SameSite=Lax`; // 7 days
         }
 
         // Show success toast and redirect

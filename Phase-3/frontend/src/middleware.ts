@@ -16,17 +16,17 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Existing auth logic
-  const sessionCookie = request.cookies.get('better-auth.session_token');
+  // Check for our custom auth token cookie instead of Better Auth session
+  const authToken = request.cookies.get('auth-token')?.value;
   const isAuthPage = request.nextUrl.pathname.startsWith('/login') ||
                      request.nextUrl.pathname.startsWith('/signup');
   const isDashboardPage = request.nextUrl.pathname.startsWith('/dashboard');
 
-  if (isDashboardPage && !sessionCookie) {
+  if (isDashboardPage && !authToken) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  if (isAuthPage && sessionCookie) {
+  if (isAuthPage && authToken) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 

@@ -23,9 +23,11 @@ export function SignOutButton() {
                 },
             });
 
-            // Clear the stored token from localStorage
+            // Clear the stored token from localStorage and cookie
             if (typeof window !== 'undefined') {
                 localStorage.removeItem('auth-token');
+                // Clear the auth cookie
+                document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
             }
 
             // Show success toast
