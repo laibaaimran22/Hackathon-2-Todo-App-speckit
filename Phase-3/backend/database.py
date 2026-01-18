@@ -43,6 +43,14 @@ def init_db():
         print(f"Error creating database tables: {str(e)}")
         raise
 
-def get_session():
+from contextlib import contextmanager
+from typing import Generator
+
+def get_session() -> Generator[Session, None, None]:
     with Session(engine) as session:
-        yield session
+        try:
+            yield session
+            session.commit()
+        except Exception:
+            session.rollback()
+            raise

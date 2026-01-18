@@ -3,19 +3,19 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import os
 from jose import jwt, JWTError
 from dotenv import load_dotenv
+from typing import Tuple
 
 load_dotenv()
 
 security = HTTPBearer()
 
-def get_current_user_id(authorization: HTTPAuthorizationCredentials = Depends(security)) -> str:
+def get_current_user_data(authorization: HTTPAuthorizationCredentials = Depends(security)) -> Tuple[str, str]:
     """
-    Extract user ID from JWT token using shared BETTER_AUTH_SECRET.
+    Extract user ID and email from JWT token using shared BETTER_AUTH_SECRET.
     Verifies JWT using the same secret used by Better Auth.
 
-    Better Auth JWT format:
-    - The JWT is signed with the JWT_SECRET (or BETTER_AUTH_SECRET)
-    - The user ID is typically in the 'sub' claim
+    Returns:
+        Tuple[str, str]: (user_id, email)
     """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -73,12 +73,15 @@ def get_current_user_id(authorization: HTTPAuthorizationCredentials = Depends(se
                 elif isinstance(user_obj, str):
                     user_id = user_obj
 
+            # Extract email from payload
+            email = payload.get("email", f"{user_id}@example.com") if user_id else "user@example.com"
+
             if not user_id:
                 print(f"[DEBUG] No user ID found in JWT payload. Available keys: {list(payload.keys())}")
                 raise credentials_exception
 
-            print(f"[DEBUG] Successfully extracted user_id: {user_id}")
-            return str(user_id)
+            print(f"[DEBUG] Successfully extracted user_id: {user_id}, email: {email}")
+            return str(user_id), str(email)
 
         except JWTError as jwt_error:
             print(f"[DEBUG] JWT verification failed: {str(jwt_error)}")
@@ -93,6 +96,19 @@ def get_current_user_id(authorization: HTTPAuthorizationCredentials = Depends(se
         import traceback
         traceback.print_exc()
         raise credentials_exception
+
+
+def get_current_user_id(authorization: HTTPAuthorizationCredentials = Depends(security)) -> str:
+    """
+    Extract user ID from JWT token using shared BETTER_AUTH_SECRET.
+    Verifies JWT using the same secret used by Better Auth.
+
+    Better Auth JWT format:
+    - The JWT is signed with the JWT_SECRET (or BETTER_AUTH_SECRET)
+    - The user ID is typically in the 'sub' claim
+    """
+    user_id, _ = get_current_user_data(authorization)
+    return user_id
 
 
 def get_current_user_id_from_token(token: str) -> str:

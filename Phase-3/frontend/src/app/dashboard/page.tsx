@@ -52,9 +52,12 @@ async function getUserInfoAndToken() {
     const userData = await response.json();
 
     // Extract a more user-friendly name from the user data
-    // If the email contains the user ID pattern, try to extract a better name
+    // Prioritize the actual email over user ID
     let displayName = "User";
-    if (userData.email && userData.email.includes('@example.com')) {
+    if (userData.email && !userData.email.includes('@example.com')) {
+      // If it's a real email (not the placeholder), use the part before @ as display name
+      displayName = userData.email.split('@')[0];
+    } else if (userData.email && userData.email.includes('@example.com')) {
       // If it's the default email format with user ID, try to get a friendlier name
       const userId = userData.id || userData.sub || userData.user_id;
       if (userId && userId.startsWith('user_')) {
@@ -62,9 +65,6 @@ async function getUserInfoAndToken() {
         const suffix = userId.substring(5); // Remove 'user_' prefix
         displayName = `User ${suffix.substring(0, 8)}`; // Show first 8 chars
       }
-    } else if (userData.email) {
-      // If it's a real email, use the part before @ as display name
-      displayName = userData.email.split('@')[0];
     } else if (userData.name) {
       displayName = userData.name;
     } else if (userData.username) {
