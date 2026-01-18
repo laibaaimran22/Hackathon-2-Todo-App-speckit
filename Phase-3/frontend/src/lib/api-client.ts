@@ -66,8 +66,17 @@ export async function apiClient<T>(
   }
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || `API Error: ${response.status} ${response.statusText}`);
+    try {
+      const errorData = await response.json();
+      console.error(`[API Error] ${response.status} - ${url}:`, errorData);
+      throw new Error(errorData.detail || errorData.message || `API Error: ${response.status} ${response.statusText}`);
+    } catch (e) {
+      if (e instanceof Error && e.message.includes('API Error')) {
+        throw e;
+      }
+      console.error(`[API Error] ${response.status} - ${url}: Failed to parse error response`);
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    }
   }
 
   return response.json();

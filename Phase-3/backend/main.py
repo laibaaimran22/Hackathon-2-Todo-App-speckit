@@ -43,13 +43,14 @@ def on_startup():
 # CORS Configuration - Split comma-separated string into list
 cors_origins_str = os.getenv("CORS_ORIGINS", "http://localhost:3000")
 cors_origins = [origin.strip() for origin in cors_origins_str.split(",")]
+print(f"[CORS] Configured CORS origins: {cors_origins}")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,  # Now a proper list
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 # Mount MCP server under /mcp path
@@ -168,6 +169,7 @@ def create_task(
     current_user_id: str = Depends(get_current_user_id)
 ):
     try:
+        print(f"[TASK] Creating task for user: {current_user_id}, task_data: {task_in.model_dump()}")
         # Ensure user exists in our DB (Lazy upsert)
         user = session.get(User, current_user_id)
         if not user:
@@ -176,16 +178,18 @@ def create_task(
             # In a real implementation, you'd want to pass the email from authentication
             user = User(id=current_user_id, email=f"{current_user_id}@example.com")
             session.add(user)
+            print(f"[TASK] Created new user: {current_user_id}")
 
         task_data = task_in.model_dump()
         db_task = Task(**task_data, owner_id=current_user_id)
         session.add(db_task)
         session.commit()
         session.refresh(db_task)
+        print(f"[TASK] Task created successfully: {db_task.id}")
         return db_task
     except Exception as e:
         session.rollback()  # Rollback on error
-        print(f"Error creating task: {str(e)}")
+        print(f"[ERROR] Error creating task: {str(e)}")
         import traceback
         traceback.print_exc()
         raise HTTPException(
@@ -332,6 +336,14 @@ def toggle_task_complete(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error toggling task completion: {str(e)}"
         )
+
+@app.get("/api/debug/cors")
+async def debug_cors():
+    """Debug endpoint to check CORS configuration"""
+    return {
+        "cors_origins": cors_origins,
+        "message": "CORS is working correctly if you received this response"
+    }
 
 if __name__ == "__main__":
     import uvicorn

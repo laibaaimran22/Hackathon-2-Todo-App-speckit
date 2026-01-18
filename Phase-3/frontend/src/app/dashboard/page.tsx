@@ -5,6 +5,7 @@ import { DashboardClient } from "./DashboardClient";
 
 async function getTodos(token: string): Promise<Todo[]> {
   try {
+    console.log("[Dashboard] Fetching todos with token from:", process.env.NEXT_PUBLIC_API_URL);
     // Direct server-side API call with the token
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tasks`, {
       headers: {
@@ -15,15 +16,17 @@ async function getTodos(token: string): Promise<Todo[]> {
     });
 
     if (!response.ok) {
-      console.error(`Failed to fetch todos: ${response.status} ${response.statusText}`);
+      const errorText = await response.text().catch(() => 'Unknown error');
+      console.error(`[Dashboard] Failed to fetch todos: ${response.status} ${response.statusText}`, errorText);
       // Return an empty array if there's an error, but log the error
       return [];
     }
 
     const data = await response.json();
+    console.log("[Dashboard] Successfully fetched todos:", data.length);
     return Array.isArray(data) ? data : [];
   } catch (error) {
-    console.error("Failed to fetch todos:", error);
+    console.error("[Dashboard] Failed to fetch todos:", error);
     // Return empty array in case of error to prevent server component crashes
     return [];
   }
@@ -35,10 +38,12 @@ async function getUserInfoAndToken() {
   const token = cookieStore.get('auth-token')?.value;
 
   if (!token) {
+    console.log("[Dashboard] No auth token found in cookies");
     return { userInfo: null, token: "" };
   }
 
   try {
+    console.log("[Dashboard] Verifying token with backend");
     // Verify the token by making a request to the backend
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/user`, {
       headers: { "Authorization": `Bearer ${token}` },
@@ -46,10 +51,12 @@ async function getUserInfoAndToken() {
     });
 
     if (!response.ok) {
+      console.error(`[Dashboard] Token verification failed: ${response.status}`);
       return { userInfo: null, token: "" };
     }
 
     const userData = await response.json();
+    console.log("[Dashboard] Token verified successfully");
 
     // Extract a more user-friendly name from the user data
     // Prioritize the actual email over user ID
@@ -79,7 +86,7 @@ async function getUserInfoAndToken() {
       token
     };
   } catch (error) {
-    console.error("Failed to verify token:", error);
+    console.error("[Dashboard] Failed to verify token:", error);
     return { userInfo: null, token: "" };
   }
 }
