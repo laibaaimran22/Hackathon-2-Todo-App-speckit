@@ -46,10 +46,6 @@ def init_db():
 from contextlib import contextmanager
 from typing import Generator
 
-def get_session() -> Generator[Session, None, None]:
+def get_session():
     with Session(engine) as session:
-        try:
-            yield session
-        except Exception:
-            session.rollback()
-            raise
+        yield session
