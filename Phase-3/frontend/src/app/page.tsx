@@ -91,7 +91,7 @@ export default function Home() {
           <div className="flex justify-center mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
               <Sparkles className="w-4 h-4 text-amber-400" />
-              <span className="text-sm text-white/80">Phase 2 - Spec-Driven Development</span>
+              <span className="text-sm text-white/80">Phase 3 - Spec-Driven Development</span>
             </div>
           </div>
 
