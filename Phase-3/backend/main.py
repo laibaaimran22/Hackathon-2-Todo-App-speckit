@@ -204,14 +204,9 @@ def create_task(
 @app.get("/api/tasks", response_model=List[TaskRead])
 def read_tasks(
     *,
+    session: Session = Depends(get_session),
     current_user_id: str = Depends(get_current_user_id)
 ):
-    from database import get_session
-
-    # Create session manually to handle transaction properly
-    session_gen = get_session()
-    session = next(session_gen)
-
     try:
         tasks = session.exec(select(Task).where(Task.owner_id == current_user_id)).all()
         return tasks
@@ -223,21 +218,14 @@ def read_tasks(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error reading tasks: {str(e)}"
         )
-    finally:
-        session.close()
 
 @app.get("/api/tasks/{task_id}", response_model=TaskRead)
 def read_task(
     *,
+    session: Session = Depends(get_session),
     task_id: int,
     current_user_id: str = Depends(get_current_user_id)
 ):
-    from database import get_session
-
-    # Create session manually to handle transaction properly
-    session_gen = get_session()
-    session = next(session_gen)
-
     try:
         task = session.get(Task, task_id)
         if not task:
@@ -246,19 +234,15 @@ def read_task(
             raise HTTPException(status_code=403, detail="Not authorized to access this resource")
         return task
     except HTTPException:
-        session.close()
         raise  # Re-raise HTTP exceptions as-is
     except Exception as e:
         print(f"Error reading task: {str(e)}")
         import traceback
         traceback.print_exc()
-        session.close()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error reading task: {str(e)}"
         )
-    finally:
-        session.close()
 
 @app.put("/api/tasks/{task_id}", response_model=TaskRead)
 def update_task(
