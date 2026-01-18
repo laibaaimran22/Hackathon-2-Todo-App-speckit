@@ -74,9 +74,8 @@ async def sign_in_email(request: AuthRequest):
         raise HTTPException(status_code=500, detail="Auth secret not configured")
 
     # Create a simple JWT token with user info
-    user_id = f"user_{secrets.token_hex(8)}"  # Unique user ID
     token_data = {
-        "sub": user_id,
+        "sub": f"user_{secrets.token_hex(8)}",  # Unique user ID
         "email": request.email,
         "exp": datetime.now(timezone.utc).timestamp() + 86400 * 7,  # 7 days expiry
         "iat": datetime.now(timezone.utc).timestamp()
@@ -84,29 +83,13 @@ async def sign_in_email(request: AuthRequest):
 
     token = jwt.encode(token_data, secret, algorithm="HS256")
 
-    # Add user to database if not exists
-    from database import get_session
-    from models import User
-    session_gen = get_session()
-    session = next(session_gen)
-    try:
-        existing_user = session.get(User, user_id)
-        if not existing_user:
-            db_user = User(id=user_id, email=request.email)
-            session.add(db_user)
-            session.commit()
-    except Exception:
-        session.rollback()
-    finally:
-        session.close()
-
     return {
         "session": {
             "token": token,
             "expiresAt": datetime.now(timezone.utc).timestamp() + 86400 * 7
         },
         "user": {
-            "id": user_id,
+            "id": token_data["sub"],
             "email": request.email
         }
     }
@@ -124,9 +107,8 @@ async def sign_up_email(request: AuthRequest):
     if not secret:
         raise HTTPException(status_code=500, detail="Auth secret not configured")
 
-    user_id = f"user_{secrets.token_hex(8)}"  # Unique user ID
     token_data = {
-        "sub": user_id,
+        "sub": f"user_{secrets.token_hex(8)}",  # Unique user ID
         "email": request.email,
         "exp": datetime.now(timezone.utc).timestamp() + 86400 * 7,  # 7 days expiry
         "iat": datetime.now(timezone.utc).timestamp()
@@ -134,29 +116,13 @@ async def sign_up_email(request: AuthRequest):
 
     token = jwt.encode(token_data, secret, algorithm="HS256")
 
-    # Add user to database if not exists
-    from database import get_session
-    from models import User
-    session_gen = get_session()
-    session = next(session_gen)
-    try:
-        existing_user = session.get(User, user_id)
-        if not existing_user:
-            db_user = User(id=user_id, email=request.email)
-            session.add(db_user)
-            session.commit()
-    except Exception:
-        session.rollback()
-    finally:
-        session.close()
-
     return {
         "session": {
             "token": token,
             "expiresAt": datetime.now(timezone.utc).timestamp() + 86400 * 7
         },
         "user": {
-            "id": user_id,
+            "id": token_data["sub"],
             "email": request.email
         }
     }
@@ -202,6 +168,15 @@ def create_task(
     current_user_id: str = Depends(get_current_user_id)
 ):
     try:
+        # Ensure user exists in our DB (Lazy upsert)
+        user = session.get(User, current_user_id)
+        if not user:
+            # We need to get the email from the JWT token to create a proper user
+            # Since we can't easily access the JWT payload here, we'll create with a placeholder
+            # In a real implementation, you'd want to pass the email from authentication
+            user = User(id=current_user_id, email=f"{current_user_id}@example.com")
+            session.add(user)
+
         task_data = task_in.model_dump()
         db_task = Task(**task_data, owner_id=current_user_id)
         session.add(db_task)
