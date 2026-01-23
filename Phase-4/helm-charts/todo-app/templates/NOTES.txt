@@ -1,0 +1,41 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get all {{ .Release.Name }}
+
+The Todo application has been deployed with:
+- Frontend: {{ .Values.replicaCount.frontend }} replica(s)
+- Backend: {{ .Values.replicaCount.backend }} replica(s)
+
+{{- if eq .Values.service.frontend.type "NodePort" }}
+Frontend is available at:
+  http://<node-ip>:{{ .Values.service.frontend.nodePort }}
+{{- else if eq .Values.service.frontend.type "LoadBalancer" }}
+Frontend is available at:
+  http://{{ (index .Status.loadBalancer.ingress 0).ip }}:{{ .Values.service.frontend.port }}
+{{- else }}
+Frontend is available within the cluster at:
+  http://{{ include "todo-app.fullname" . }}-frontend:{{ .Values.service.frontend.port }}
+{{- end }}
+
+Backend is available within the cluster at:
+  http://{{ include "todo-app.fullname" . }}-backend:{{ .Values.service.backend.port }}
+
+{{- if not .Values.secrets.databaseUrl }}
+##############################################################################
+####               ERROR: You must provide a database URL                 ####
+##############################################################################
+
+This deployment will be incomplete until you provide a database URL.
+Please update the secrets with your database connection string:
+
+    helm upgrade {{ .Release.Name }} . \\
+        --set secrets.databaseUrl='your-encoded-db-url' \\
+        --set secrets.jwtSecret='your-encoded-jwt-secret' \\
+        --set secrets.authSecret='your-encoded-auth-secret' \\
+        --set secrets.cohereApiKey='your-encoded-cohere-api-key'
+{{- end }}

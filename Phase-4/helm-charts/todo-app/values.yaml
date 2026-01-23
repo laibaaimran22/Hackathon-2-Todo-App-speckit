@@ -1,0 +1,72 @@
+# Default values for todo-app
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount:
+  frontend: 2
+  backend: 2
+
+image:
+  frontend:
+    repository: frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  backend:
+    repository: backend
+    tag: latest
+    pullPolicy: IfNotPresent
+
+service:
+  frontend:
+    type: NodePort
+    port: 3000
+    nodePort: 30080
+  backend:
+    type: ClusterIP
+    port: 8000
+
+resources:
+  frontend:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  backend:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+config:
+  corsOrigins: "http://frontend-service:3000,http://localhost:3000"
+  port: "8000"
+  nextPublicBackendUrl: "http://backend-service:8000"
+  nextPublicApiBaseUrl: "http://backend-service:8000"
+
+# These should be provided separately as secrets
+secrets:
+  databaseUrl: ""
+  jwtSecret: ""
+  authSecret: ""
+  cohereApiKey: ""
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
