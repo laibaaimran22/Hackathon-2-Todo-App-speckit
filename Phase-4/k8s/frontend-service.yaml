@@ -5,10 +5,11 @@ metadata:
   labels:
     app: frontend
 spec:
-  type: NodePort
+  type: NodePort  # For Minikube access
   ports:
-  - port: 3000
+  - port: 80
     targetPort: 3000
-    nodePort: 30080
+    nodePort: 30080  # Specific port for consistency
+    name: http
   selector:
     app: frontend

@@ -1,32 +1,41 @@
-FROM python:3.11-slim
+# Multi-stage build for FastAPI backend
+FROM python:3.11-slim AS builder
 
-# Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first to leverage Docker cache
+# Copy requirements and install dependencies
 COPY requirements.txt .
-
-# Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Install uvicorn for production
-RUN pip install --no-cache-dir "uvicorn[standard]"
+# Production stage
+FROM python:3.11-slim
 
-# Copy the rest of the application
+WORKDIR /app
+
+# Create non-root user
+RUN groupadd -g 1001 python && \
+    useradd -m -u 1001 -g python python
+
+# Copy installed packages from builder stage
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# Copy application code
 COPY . .
 
-# Expose port (Hugging Face Spaces uses PORT environment variable)
+# Change ownership to non-root user
+RUN chown -R python:python /app
+USER python
+
+# Expose port
 EXPOSE 8000
 
-# Create a script to run the application with error handling
-RUN echo '#!/bin/bash\nset -e\nif [ -z "$DATABASE_URL" ]; then\n  echo "ERROR: DATABASE_URL environment variable is not set!"\n  exit 1\nfi\nexec python startup.py' > run.sh && chmod +x run.sh
-
 # Run the application
-CMD ["./run.sh"]
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

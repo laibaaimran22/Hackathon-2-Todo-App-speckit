@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: app-config
 data:
-  cors_origins: "http://frontend-service:3000,http://localhost:3000"
-  port: "8000"
-  next_public_backend_url: "http://backend-service:8000"
-  next_public_api_base_url: "http://backend-service:8000"
+  NODE_ENV: "production"
+  NEXT_PUBLIC_APP_URL: "http://localhost:30080"
+  CORS_ORIGINS: "http://localhost:30080,http://127.0.0.1:30080"
+  LOG_LEVEL: "info"

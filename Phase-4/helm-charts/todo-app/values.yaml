@@ -1,72 +1,76 @@
 # Default values for todo-app
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
 
-replicaCount:
-  frontend: 2
-  backend: 2
-
-image:
-  frontend:
-    repository: frontend
+# Frontend configuration
+frontend:
+  replicaCount: 2
+  image:
+    repository: todo-frontend
     tag: latest
-    pullPolicy: IfNotPresent
-  backend:
-    repository: backend
-    tag: latest
-    pullPolicy: IfNotPresent
-
-service:
-  frontend:
+    pullPolicy: Never
+  service:
     type: NodePort
-    port: 3000
+    port: 80
+    targetPort: 3000
     nodePort: 30080
-  backend:
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env:
+    NEXT_PUBLIC_API_URL: "http://backend-service:8000"
+    NEXT_PUBLIC_APP_URL: "http://localhost:30080"
+    NODE_ENV: "production"
+
+# Backend configuration
+backend:
+  replicaCount: 2
+  image:
+    repository: todo-backend
+    tag: latest
+    pullPolicy: Never
+  service:
     type: ClusterIP
     port: 8000
-
-resources:
-  frontend:
-    limits:
-      cpu: 500m
-      memory: 512Mi
+    targetPort: 8000
+  resources:
     requests:
-      cpu: 250m
-      memory: 256Mi
-  backend:
+      memory: "512Mi"
+      cpu: "500m"
     limits:
-      cpu: 1000m
-      memory: 1Gi
-    requests:
-      cpu: 500m
-      memory: 512Mi
+      memory: "1Gi"
+      cpu: "1000m"
+  env:
+    CORS_ORIGINS: "http://localhost:30080,http://127.0.0.1:30080"
 
+# Configuration
 config:
-  corsOrigins: "http://frontend-service:3000,http://localhost:3000"
-  port: "8000"
-  nextPublicBackendUrl: "http://backend-service:8000"
-  nextPublicApiBaseUrl: "http://backend-service:8000"
+  nodeEnv: "production"
+  nextPublicAppUrl: "http://localhost:30080"
+  corsOrigins: "http://localhost:30080,http://127.0.0.1:30080"
+  logLevel: "info"
 
-# These should be provided separately as secrets
-secrets:
-  databaseUrl: ""
-  jwtSecret: ""
-  authSecret: ""
-  cohereApiKey: ""
+# Probes
+probes:
+  liveness:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
 
-ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
+# Security context
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+    - ALL

@@ -91,7 +91,7 @@ export default function Home() {
           <div className="flex justify-center mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
               <Sparkles className="w-4 h-4 text-amber-400" />
-              <span className="text-sm text-white/80">Phase 4 - Spec-Driven Development</span>
+              <span className="text-sm text-white/80">Phase 3 - Spec-Driven Development</span>
             </div>
           </div>
 
@@ -190,7 +190,7 @@ export default function Home() {
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-teal-500 to-brand-coral-500 flex items-center justify-center">
                   <CheckCircle2 className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-white/60 text-sm">Todo Evolution Phase 4</span>
+                <span className="text-white/60 text-sm">Todo Evolution Phase 3</span>
               </div>
               <p className="text-white/40 text-sm">
                 Spec-Driven Development Hackathon Project

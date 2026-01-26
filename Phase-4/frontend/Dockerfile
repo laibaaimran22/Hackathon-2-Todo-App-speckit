@@ -1,54 +1,37 @@
-# Use Node.js 20 as the base image
 FROM node:20-alpine AS builder
 
-# Install system dependencies for native modules
-RUN apk add --no-cache python3 make g++
-
-# Set working directory
 WORKDIR /app
+
+# Install build dependencies for native modules
+RUN apk add --no-cache python3 make g++
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies with longer timeout
+RUN npm ci --prefer-offline --no-audit 2>&1 || npm install --legacy-peer-deps
 
-# Copy source code
+# Copy source
 COPY . .
 
-# Set environment variables for build time (with correct values for Kubernetes)
-ENV NEXT_PUBLIC_BACKEND_URL="http://todo-app-backend:8000"
-ENV NEXT_PUBLIC_API_BASE_URL="http://todo-app-backend:8000"
-ENV DATABASE_URL="postgresql://dummy:dummy@dummy:5432/dummy"
-ENV JWT_SECRET="dummy_secret"
-ENV BETTER_AUTH_SECRET="dummy_secret"
-ENV COHERE_API_KEY="dummy_key"
+# Provide dummy DATABASE_URL for build
+ARG DATABASE_URL=postgresql://dummy:dummy@localhost/dummy
+ENV DATABASE_URL=$DATABASE_URL
 
-# Build the application
-RUN npx next build
+# Build
+RUN npm run build
 
-# Production stage - copy the built application
-FROM node:20-alpine AS runner
+# Production stage
+FROM node:20-alpine
 
-# Install system dependencies needed at runtime
-RUN apk add --no-cache python3
-
-# Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy only built files and node_modules needed for production
 COPY --from=builder /app/package*.json ./
-
-# Install only production dependencies
-RUN npm install --only=production
-
-# Copy the built Next.js app from the builder stage
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/node_modules ./node_modules
 
-# Expose port
 EXPOSE 3000
 
-# Start the standalone Next.js application
-CMD ["node", ".next/standalone/server.js"]
+CMD ["npm", "start"]
