@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function middleware(request: NextRequest) {
   // Check for Better Auth session token (support common cookie names)
   const sessionCookie =
+    request.cookies.get('__Secure-better-auth.session_token') ||
     request.cookies.get('better-auth.session_token') ||
     request.cookies.get('better-auth.session-token') ||
     request.cookies.get('better-auth.session') ||
