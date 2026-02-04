@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: dapr-placement
+  namespace: dapr-system
+spec:
+  serviceName: dapr-placement
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dapr-placement
+  template:
+    metadata:
+      labels:
+        app: dapr-placement
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+      - name: dapr-placement
+        image: docker.io/daprio/dapr:1.12.0
+        command:
+        - ./placement
+        - --log-level
+        - info
+        - --port
+        - "50005"
+        ports:
+        - containerPort: 50005
+          name: grpc
+        volumeMounts:
+        - name: dapr-placement-log
+          mountPath: /var/run/dapr/logs
+      volumes:
+      - name: dapr-placement-log
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dapr-placement
+  namespace: dapr-system
+  labels:
+    app: dapr-placement
+spec:
+  ports:
+  - port: 50005
+    name: grpc
+    targetPort: 50005
+  clusterIP: None
+  selector:
+    app: dapr-placement

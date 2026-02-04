@@ -96,3 +96,4 @@ config/test.json
 
 # CLAUDE
 .claude/
+nul

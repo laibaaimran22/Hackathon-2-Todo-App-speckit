@@ -1,0 +1,120 @@
+# Default values for todo-app
+
+# Dapr configuration
+dapr:
+  enabled: true
+  appId: todo-app
+  appPort: 8000
+  config: dapr-config
+  logAsJson: true
+
+# Frontend configuration
+frontend:
+  replicaCount: 2
+  image:
+    repository: todo-frontend
+    tag: latest
+    pullPolicy: Always  # Changed for Oracle Cloud deployment
+  service:
+    type: ClusterIP
+    port: 3000
+    targetPort: 3000
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env:
+    NEXT_PUBLIC_API_URL: "http://backend-service:8000"
+    NEXT_PUBLIC_APP_URL: "http://todo-evolution.yourdomain.com"  # Replace with your domain
+    NODE_ENV: "production"
+
+# Backend configuration
+backend:
+  replicaCount: 2
+  image:
+    repository: todo-backend
+    tag: latest
+    pullPolicy: Always  # Changed for Oracle Cloud deployment
+  service:
+    type: ClusterIP
+    port: 8000
+    targetPort: 8000
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  env:
+    CORS_ORIGINS: "https://todo-evolution.yourdomain.com,http://localhost:3000"  # Updated for production
+
+# Redpanda configuration
+redpanda:
+  enabled: true
+  image:
+    repository: docker.redpanda.com/redpandadata/redpanda
+    tag: v23.2.13
+  service:
+    kafkaPort: 9092
+    adminPort: 9644
+
+# Valkey (Redis replacement) configuration
+valkey:
+  enabled: true
+  image:
+    repository: docker.io/valkey/valkey
+    tag: latest
+  service:
+    port: 6379
+
+# Configuration
+config:
+  nodeEnv: "production"
+  nextPublicAppUrl: "https://todo-evolution.yourdomain.com"  # Replace with your domain
+  corsOrigins: "https://todo-evolution.yourdomain.com,http://localhost:3000"  # Updated for production
+  logLevel: "info"
+
+# Probes
+probes:
+  liveness:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+# Security context
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+    - ALL
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: todo-evolution.yourdomain.com  # Replace with your domain
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: todo-tls-secret
+      hosts:
+        - todo-evolution.yourdomain.com  # Replace with your domain

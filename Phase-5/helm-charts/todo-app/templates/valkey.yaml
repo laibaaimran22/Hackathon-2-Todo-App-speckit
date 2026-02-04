@@ -1,0 +1,64 @@
+{{- if .Values.valkey.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "todo-app.fullname" . }}-valkey
+  labels:
+    {{- include "todo-app.labels" . | nindent 4 }}
+    app: valkey
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "todo-app.selectorLabels" . | nindent 6 }}
+      app: valkey
+  template:
+    metadata:
+      labels:
+        {{- include "todo-app.selectorLabels" . | nindent 8 }}
+        app: valkey
+    spec:
+      containers:
+      - name: valkey
+        image: "{{ .Values.valkey.image.repository }}:{{ .Values.valkey.image.tag }}"
+        ports:
+        - containerPort: {{ .Values.valkey.service.port }}
+          name: valkey
+        command:
+        - valkey-server
+        args:
+        - --save
+        - ""
+        - --appendonly
+        - "no"
+        - --bind
+        - "0.0.0.0"
+        - --port
+        - "{{ .Values.valkey.service.port }}"
+        - --protected-mode
+        - "no"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "todo-app.fullname" . }}-valkey
+  labels:
+    {{- include "todo-app.labels" . | nindent 4 }}
+    app: valkey
+spec:
+  selector:
+    app: valkey
+  ports:
+  - protocol: TCP
+    port: {{ .Values.valkey.service.port }}
+    targetPort: {{ .Values.valkey.service.port }}
+    name: valkey
+  type: ClusterIP
+{{- end }}

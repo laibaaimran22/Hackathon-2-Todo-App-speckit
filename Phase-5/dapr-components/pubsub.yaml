@@ -1,0 +1,20 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: task-pubsub
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+  # Kafka/Redpanda brokers
+  - name: brokers
+    value: "redpanda:9092"  # This will be the service name in Kubernetes
+  # Consumer configuration
+  - name: consumerGroup
+    value: "task-group"
+  # Producer configuration
+  - name: disableTls
+    value: "true"
+  # Authentication (if needed)
+  - name: authRequired
+    value: "false"
