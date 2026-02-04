@@ -31,28 +31,6 @@ export default function SignupPage() {
       });
 
       if (result.data) {
-        // Also fetch JWT from backend and store it for API calls
-        try {
-          const apiBase = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
-          if (apiBase) {
-            const backendResp = await fetch(`${apiBase}/api/auth/sign-in/email`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email, password }),
-            });
-            if (backendResp.ok) {
-              const data = await backendResp.json();
-              const token = data?.session?.token;
-              if (token) {
-                localStorage.setItem("auth-token", token);
-                document.cookie = `auth-token=${token}; Path=/; SameSite=Lax; Secure`;
-              }
-            }
-          }
-        } catch (err) {
-          console.error("Failed to store backend auth token:", err);
-        }
-
         // Success - show toast and redirect
         toast.success("Account created successfully!", {
           description: "Welcome to Todo Evolution! Redirecting...",
