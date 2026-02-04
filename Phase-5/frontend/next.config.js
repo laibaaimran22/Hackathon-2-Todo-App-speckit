@@ -1,28 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Use webpack instead of Turbopack
-  experimental: {
-    appDir: true,
-  },
-
-  // Proxy API requests to the backend server
+  // Proxy backend API requests in production
   async rewrites() {
+    const apiBase = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "");
     return [
       {
-        source: '/api/auth/:path*',
-        destination: 'http://localhost:8000/api/auth/:path*',
-      },
-      {
         source: '/api/tasks/:path*',
-        destination: 'http://localhost:8000/api/tasks/:path*',
+        destination: `${apiBase}/api/tasks/:path*`,
       },
       {
         source: '/api/debug/:path*',
-        destination: 'http://localhost:8000/api/debug/:path*',
+        destination: `${apiBase}/api/debug/:path*`,
       },
       {
         source: '/mcp/:path*',
-        destination: 'http://localhost:8000/mcp/:path*',
+        destination: `${apiBase}/mcp/:path*`,
       },
     ];
   },
