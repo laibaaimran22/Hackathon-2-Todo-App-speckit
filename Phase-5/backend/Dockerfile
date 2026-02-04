@@ -34,8 +34,8 @@ COPY . .
 RUN chown -R python:python /app
 USER python
 
-# Expose port
-EXPOSE 8000
+# Expose port expected by Hugging Face Spaces
+EXPOSE 7860
 
-# Run the application
-CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the application (Hugging Face provides PORT; default to 7860)
+CMD ["bash", "-lc", "python -m uvicorn main:app --host 0.0.0.0 --port ${PORT:-7860}"]
